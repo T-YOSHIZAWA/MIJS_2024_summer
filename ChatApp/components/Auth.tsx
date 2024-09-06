@@ -25,6 +25,8 @@ export class Auth extends React.Component<AuthProps, AuthState> {
     componentDidMount(): void {
         OnAuthStateChanged(async (user) => {
             if (user !== null) {
+                const token = await user.getIdToken();
+                console.log(`ID_TOKEN: ${token}`);
                 //ログインしていれば、ユーザ情報をStateへ設定する
                 this.setState({
                     checked: true,
