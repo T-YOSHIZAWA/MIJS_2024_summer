@@ -104,8 +104,8 @@ export async function logout() {
 const MESSAGE_COLLECTION = '/messages';
 const USER_COLLECTION = '/users';
 
-export function OnAuthStateChanged(callback: (user: User | null) => void) {
-    onAuthStateChanged(auth, callback);
+export function OnAuthStateChanged(callback: (user: User | null) => void): Unsubscribe {
+    return onAuthStateChanged(auth, callback);
 }
 export const FirebaseContext = React.createContext<User | null>(null);
 

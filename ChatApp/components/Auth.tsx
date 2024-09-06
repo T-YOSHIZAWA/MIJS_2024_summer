@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { OnAuthStateChanged, FirebaseContext } from '../libs/Firebase';
-import { User } from 'firebase/auth';
+import { Unsubscribe, User } from 'firebase/auth';
 import { StyleSheet, Text, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 
@@ -14,6 +14,8 @@ interface AuthProps {
 }
 
 export class Auth extends React.Component<AuthProps, AuthState> {
+    unsub?: Unsubscribe;
+
     constructor(props: AuthProps) {
         super(props);
         this.state = {
@@ -23,7 +25,7 @@ export class Auth extends React.Component<AuthProps, AuthState> {
     }
 
     componentDidMount(): void {
-        OnAuthStateChanged(async (user) => {
+        this.unsub = OnAuthStateChanged(async (user) => {
             if (user !== null) {
                 const token = await user.getIdToken();
                 console.log(`ID_TOKEN: ${token}`);
@@ -41,6 +43,13 @@ export class Auth extends React.Component<AuthProps, AuthState> {
                 });
             }
         });
+    }
+
+    componentWillUnmount(): void {
+        //ComponentがUnmountする際、unsubが設定されていれば、unsubを実行する(AuthのListenerをデタッチ)
+        if (this.unsub !== undefined) {
+            this.unsub();
+        }
     }
 
     render(): React.ReactNode {
