@@ -148,13 +148,17 @@ export async function getMessage(id: string): Promise<DocumentSnapshot<ChatMessa
 }
 
 export async function sendMessage(message: ChatMessage): Promise<void> {
-    //"timestamp"はFirebase側で自動設定されるため、こちらからは設定しないようにする
     //DocumentData型(≒any)にすることで、項目を任意にする
     //const chatRef = collection(db, MESSAGE_COLLECTION) as CollectionReference<ChatMessage>;
     const chatRef = collection(db, MESSAGE_COLLECTION) as CollectionReference<DocumentData>;
 
-    //await addDoc(chatRef, { ...message, timestamp: serverTimestamp() });
-    await addDoc(chatRef, { ...message, timestamp: null });
+    if (process.env.EXPO_PUBLIC_LOCAL === "true") {
+        //ローカル環境の場合は"timestamp"にserverTimestampを設定する
+        await addDoc(chatRef, { ...message, timestamp: serverTimestamp() });
+    } else {
+        //"timestamp"はFirebase側で自動設定されるため、こちらからは設定しないようにする
+        await addDoc(chatRef, { ...message, timestamp: null });
+    }
 }
 //-----------------
 
