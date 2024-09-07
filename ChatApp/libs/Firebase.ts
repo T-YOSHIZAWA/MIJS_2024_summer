@@ -148,10 +148,13 @@ export async function getMessage(id: string): Promise<DocumentSnapshot<ChatMessa
 }
 
 export async function sendMessage(message: ChatMessage): Promise<void> {
-    const chatRef = collection(db, MESSAGE_COLLECTION) as CollectionReference<ChatMessage>;
-    //date項目にはFirestoreの時刻データを設定する
-    //await addDoc(chatRef, message);
-    await addDoc(chatRef, { ...message, timestamp: serverTimestamp() });
+    //"timestamp"はFirebase側で自動設定されるため、こちらからは設定しないようにする
+    //DocumentData型(≒any)にすることで、項目を任意にする
+    //const chatRef = collection(db, MESSAGE_COLLECTION) as CollectionReference<ChatMessage>;
+    const chatRef = collection(db, MESSAGE_COLLECTION) as CollectionReference<DocumentData>;
+
+    //await addDoc(chatRef, { ...message, timestamp: serverTimestamp() });
+    await addDoc(chatRef, { ...message, timestamp: null });
 }
 //-----------------
 
